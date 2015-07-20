@@ -1031,6 +1031,8 @@ class ProcManager(object):
             #         process_resource_id="", service_name="")
             # This is a PENDING process without process_id
             pass
+        elif not proc_inst:
+            pass
         else:
             try:
                 self.event_pub.publish_event(event_type=OT.ProcessLifecycleEvent,

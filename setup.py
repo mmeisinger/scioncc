@@ -75,7 +75,8 @@ setup(  name='scioncc',
             'pyyaml==3.10',
             'simplejson==3.6.5',
             'msgpack-python==0.1.13',  # TBD: Check if this specific version is needed
-            'pika==0.9.5',             # Messaging stack is tested and working with issues of this version
+            #'pika==0.9.5',             # Messaging stack is tested and working with issues of this version
+            'pika==0.9.14',             # Messaging stack is tested and working with issues of this version
             'httplib2==0.9.1',
             'zope.interface==4.1.1',
             'psycopg2==2.5.4',

@@ -205,9 +205,10 @@ class NodeB(BaseNode):
 
         If this method returns false, the channel should be discarded and a new one created.
         """
-        cbs = self.client.callbacks._callbacks
-        if "_on_basic_deliver" not in cbs[ch.get_channel_id()].iterkeys():
-            return False
+        cbs = self.client.callbacks._stack
+        # TODO: Check - maybe this is ok with latest pika
+        # if "_on_basic_deliver" not in cbs[str(ch.get_channel_id())]:
+        #     return False
 
         return True
 
@@ -336,9 +337,8 @@ class PyonSelectConnection(SelectConnection):
     choke. This class overrides the _next_channel_number method in Pika, to hand out channel
     numbers that we deem safe.
     """
-    def __init__(self, parameters=None, on_open_callback=None, reconnection_strategy=None):
-        SelectConnection.__init__(self, parameters=parameters, on_open_callback=on_open_callback,
-                                  reconnection_strategy=reconnection_strategy)
+    def __init__(self, parameters=None, on_open_callback=None):
+        SelectConnection.__init__(self, parameters=parameters, on_open_callback=on_open_callback)
         self._bad_channel_numbers = set()
         self._pending = set()
 
@@ -351,7 +351,7 @@ class PyonSelectConnection(SelectConnection):
         use, so no bad channel number will ever be re-used.
         """
         # Our limit is the the Codec's Channel Max or MAX_CHANNELS if it's None
-        limit = self.parameters.channel_max or pikachannel.MAX_CHANNELS
+        limit = self.params.channel_max or pikachannel.MAX_CHANNELS
 
         # generate a set of available channels
         available = set(xrange(1, limit+1))

@@ -807,7 +807,7 @@ class ExchangeManager(object):
         Builds a URL to be used with the Rabbit HTTP management API.
         """
         node = self._priv_nodes.get(ION_DEFAULT_BROKER, self.default_node)
-        host = node.client.parameters.host
+        host = node.client.params.host
 
         from putil.rabbitmq.rabbit_util import RabbitManagementUtil
         url = RabbitManagementUtil.get_mgmt_url(CFG, feats)

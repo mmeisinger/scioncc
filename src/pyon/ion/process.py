@@ -566,4 +566,5 @@ def get_ion_actor_id(process):
     if process:
         ctx = process.get_context()
         ion_actor_id = ctx.get(MSG_HEADER_ACTOR, None) if ctx else None
+        ion_actor_id = str(ion_actor_id) if ion_actor_id is not None else None
     return ion_actor_id

@@ -14,6 +14,7 @@ from contextlib import contextmanager
 from uuid import uuid4
 from collections import defaultdict
 from pika import BasicProperties
+from pika.exceptions import ChannelClosed
 from gevent.event import AsyncResult, Event
 from gevent.queue import Queue
 from gevent import sleep
@@ -280,7 +281,7 @@ class AMQPTransport(BaseTransport):
         self._close_callbacks = []
         self.lock = False
 
-    def _on_underlying_close(self, code, text):
+    def _on_underlying_close(self, conn, code, text):
         if not (code == 0 or code == 200):
             log.error("AMQPTransport.underlying closed:\n\tchannel number: %s\n\tcode: %d\n\ttext: %s", self.channel_number, code, text)
 
@@ -314,7 +315,10 @@ class AMQPTransport(BaseTransport):
         if self.lock:
             return
 
-        self._client.close()
+        try:
+            self._client.close()
+        except ChannelClosed:
+            pass
 
     @property
     def channel_number(self):
@@ -345,11 +349,11 @@ class AMQPTransport(BaseTransport):
                 ret.append(kwargs)
             ar.set(ret)
 
-        eb = lambda ch, *args: ar.set(TransportError("_sync_call could not complete due to an error (%s)" % args))
+        eb = lambda ch, *args: ar.set(TransportError("_sync_call could not complete due to an error (%s)" % str(args)))
 
-        kwargs[cb_arg] = cb
+        #kwargs[cb_arg] = cb
         with self._push_close_cb(eb):
-            func(*args, **kwargs)
+            func(cb, *args, **kwargs)
             # Note: MM (2014-04-03): It seems that gevent block or something else can lead to this timeout
             # hitting. Increased from 10 to 20
             ret_vals = ar.get(timeout=20)
@@ -501,7 +505,7 @@ class AMQPTransport(BaseTransport):
         Adjusts quality of service for a channel.
         """
         #log.debug("AMQPTransport.qos_impl(%s): pf_size %s, pf_count %s, global_ %s", self._client.channel_number, prefetch_size, prefetch_count, global_)
-        self._sync_call(self._client.basic_qos, 'callback', prefetch_size=prefetch_size, prefetch_count=prefetch_count, global_=global_)
+        self._sync_call(self._client.basic_qos, 'callback', prefetch_size=prefetch_size, prefetch_count=prefetch_count)
 
     def publish_impl(self, exchange, routing_key, body, properties, immediate=False, mandatory=False, durable_msg=False):
         """

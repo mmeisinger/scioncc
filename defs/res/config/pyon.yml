@@ -54,7 +54,7 @@ server:
   amqp:
     # The normal container broker connection
     type: amqp_91
-    host: localhost
+    host: 127.0.0.1
     port: 5672
     username: guest
     password: guest
@@ -63,7 +63,7 @@ server:
   amqp_priv:
     # The privileged broker connection used for making changes to broker resources
     type: amqp_91
-    host: localhost
+    host: 127.0.0.1
     port: 5672
     username: ion
     password: ion
