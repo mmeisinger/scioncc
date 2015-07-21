@@ -351,7 +351,6 @@ class AMQPTransport(BaseTransport):
 
         eb = lambda ch, *args: ar.set(TransportError("_sync_call could not complete due to an error (%s)" % str(args)))
 
-        #kwargs[cb_arg] = cb
         with self._push_close_cb(eb):
             func(cb, *args, **kwargs)
             # Note: MM (2014-04-03): It seems that gevent block or something else can lead to this timeout

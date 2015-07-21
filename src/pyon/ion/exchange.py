@@ -142,6 +142,8 @@ class ExchangeManager(object):
 
             except socket.error as e:
                 log.warn("Could not start connection %s due to socket error, continuing", broker_name)
+            except messaging.AMQPConnectionError as e:
+                log.warn("Could not start connection %s due to AMQP connection error, continuing", broker_name)
 
         fail_count = total_count - len(self._nodes) - len(self._priv_nodes)
         if fail_count > 0 or total_count == 0:

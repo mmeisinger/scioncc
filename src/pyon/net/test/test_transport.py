@@ -206,45 +206,40 @@ class TestAMQPTransport(PyonTestCase):
 
     def test__sync_call_no_ret_value(self):
 
-        def async_func(*args, **kwargs):
-            cbparam = kwargs.get('callback')
-            cbparam()
+        def async_func(cb, *args, **kwargs):
+            cb()
 
         tp = AMQPTransport(Mock())
         rv = tp._sync_call(async_func, 'callback')
         self.assertIsNone(rv)
 
     def test__sync_call_with_ret_value(self):
-        def async_func(*args, **kwargs):
-            cbparam = kwargs.get('callback')
-            cbparam(sentinel.val)
+        def async_func(cb, *args, **kwargs):
+            cb(sentinel.val)
 
         tp = AMQPTransport(Mock())
         rv = tp._sync_call(async_func, 'callback')
         self.assertEquals(rv, sentinel.val)
 
     def test__sync_call_with_mult_rets(self):
-        def async_func(*args, **kwargs):
-            cbparam = kwargs.get('callback')
-            cbparam(sentinel.val, sentinel.val2)
+        def async_func(cb, *args, **kwargs):
+            cb(sentinel.val, sentinel.val2)
 
         tp = AMQPTransport(Mock())
         rv = tp._sync_call(async_func, 'callback')
         self.assertEquals(rv, (sentinel.val, sentinel.val2))
 
     def test__sync_call_with_kwarg_rets(self):
-        def async_func(*args, **kwargs):
-            cbparam = kwargs.get('callback')
-            cbparam(sup=sentinel.val, sup2=sentinel.val2)
+        def async_func(cb, *args, **kwargs):
+            cb(sup=sentinel.val, sup2=sentinel.val2)
 
         tp = AMQPTransport(Mock())
         rv = tp._sync_call(async_func, 'callback')
         self.assertEquals(rv, {'sup':sentinel.val, 'sup2':sentinel.val2})
 
     def test__sync_call_with_normal_and_kwarg_rets(self):
-        def async_func(*args, **kwargs):
-            cbparam = kwargs.get('callback')
-            cbparam(sentinel.arg, sup=sentinel.val, sup2=sentinel.val2)
+        def async_func(cb, *args, **kwargs):
+            cb(sentinel.arg, sup=sentinel.val, sup2=sentinel.val2)
 
         tp = AMQPTransport(Mock())
         rv = tp._sync_call(async_func, 'callback')
@@ -273,7 +268,7 @@ class TestAMQPTransport(PyonTestCase):
         cb = Mock()
         tp.add_on_close_callback(cb)
 
-        tp._on_underlying_close(200, sentinel.text)
+        tp._on_underlying_close(None, 200, sentinel.text)
 
         cb.assert_called_once_with(tp, 200, sentinel.text)
 
@@ -287,7 +282,7 @@ class TestAMQPTransport(PyonTestCase):
     def test__on_underlying_close_error(self, mocklog):
         tp = AMQPTransport(Mock())
 
-        tp._on_underlying_close(404, sentinel.text)
+        tp._on_underlying_close(None, 404, sentinel.text)
 
         self.assertEquals(mocklog.error.call_count, 1)
         self.assertIn(sentinel.text, mocklog.error.call_args[0])
@@ -469,8 +464,7 @@ class TestAMQPTransportCommonMethods(PyonTestCase):
         self.tp._sync_call.assert_called_once_with(self.tp._client.basic_qos,
                                                    'callback',
                                                    prefetch_size=0,
-                                                   prefetch_count=0,
-                                                   global_=False)
+                                                   prefetch_count=0)
 
     @patch('pyon.net.transport.BasicProperties')
     def test_publish_impl(self, bpmock):

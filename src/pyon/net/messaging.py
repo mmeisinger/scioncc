@@ -11,7 +11,7 @@ from pika.credentials import PlainCredentials
 from pika.connection import ConnectionParameters
 from pika.adapters import SelectConnection
 from pika import channel as pikachannel
-from pika.exceptions import NoFreeChannels
+from pika.exceptions import NoFreeChannels, AMQPConnectionError
 
 from pyon.core.bootstrap import CFG, get_sys_name
 from pyon.net import channel

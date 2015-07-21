@@ -2,21 +2,23 @@
 
 __author__ = 'Dave Foster <dfoster@asascience.com>'
 
-
-from pyon.net.messaging import NodeB, ioloop, make_node, PyonSelectConnection
-from pyon.net.channel import BaseChannel, BidirClientChannel, RecvChannel
-from pyon.util.unit_test import PyonTestCase
 from mock import Mock, sentinel, patch
 from nose.plugins.attrib import attr
 from pika.connection import Connection
-from pyon.core import bootstrap
-from pyon.util.int_test import IonIntegrationTestCase
-from pyon.util.async import spawn
+from pika.exceptions import NoFreeChannels
 from gevent import event, queue
 import time
+
+from pyon.core import bootstrap
+from pyon.net.messaging import NodeB, ioloop, make_node, PyonSelectConnection
+from pyon.net.channel import BaseChannel, BidirClientChannel, RecvChannel
+from pyon.util.unit_test import PyonTestCase
+from pyon.util.int_test import IonIntegrationTestCase
+from pyon.util.async import spawn
 from pyon.util.containers import DotDict
-from pika.exceptions import NoFreeChannels
+
 from interface.services.icontainer_agent import ContainerAgentClient
+
 
 @attr('UNIT')
 class TestNodeB(PyonTestCase):
@@ -285,8 +287,8 @@ class TestPyonSelectConnection(PyonTestCase):
 
     @patch('pyon.net.messaging.SelectConnection')
     def setUp(self, _):
-        self.conn = PyonSelectConnection(sentinel.conn_params, sentinel.open_callback, sentinel.reconn_strat)
-        self.conn.parameters = DotDict({'channel_max':25})
+        self.conn = PyonSelectConnection(sentinel.conn_params, sentinel.open_callback)
+        self.conn.params = DotDict({'channel_max':25})
         self.conn._channels = {}
 
     def test_mark_bad_channel(self):
