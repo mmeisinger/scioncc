@@ -735,14 +735,19 @@ class RecvChannel(BaseChannel):
         self._recv_binding = binding
 
     def _on_deliver(self, chan, method_frame, header_frame, body):
+        """ Central message inbound callback """
 
-        consumer_tag = method_frame.consumer_tag # use to further route?
-        delivery_tag = method_frame.delivery_tag # use to ack
+        consumer_tag = method_frame.consumer_tag  # use to further route?
+        delivery_tag = method_frame.delivery_tag  # use to ack
         redelivered = method_frame.redelivered
         exchange = method_frame.exchange
         routing_key = method_frame.routing_key
 
-        header_frame.headers.update({'routing_key':routing_key})
+        header_frame.headers.update({'routing_key': routing_key})
+        # Fix new Pika delivering headers as unicode
+        for k, v in header_frame.headers.iteritems():
+            if isinstance(v, unicode):
+                header_frame.headers[k] = v.encode("utf8")
 
         #log.debug("RecvChannel._on_deliver, tag: %s, cur recv_queue len %s", delivery_tag, self._recv_queue.qsize())
 

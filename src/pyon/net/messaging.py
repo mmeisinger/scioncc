@@ -395,7 +395,10 @@ def make_node(connection_params=None, name=None, timeout=None):
     node = NodeB()
     connection_params = connection_params or CFG.get_safe("server.amqp")
     credentials = PlainCredentials(connection_params["username"], connection_params["password"])
-    conn_parameters = ConnectionParameters(host=connection_params["host"],
+    host = connection_params["host"]
+    if host == "localhost":
+        host = "127.0.0.1"  # Fixe because latest Pika treats localhost as IPv6
+    conn_parameters = ConnectionParameters(host=host,
                                            virtual_host=connection_params["vhost"],
                                            port=connection_params["port"],
                                            credentials=credentials)
