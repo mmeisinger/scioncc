@@ -900,11 +900,7 @@ class TestExchangeObjectsCreateDelete(IonIntegrationTestCase):
 class TestExchangeObjectsDurableFlag(IonIntegrationTestCase):
     def setUp(self):
         self._start_container()
-        def cleanup_broker():
-            from putil.rabbitmq.rabbit_util import RabbitManagementUtil
-            rabbit_util = RabbitManagementUtil(CFG, sysname=get_sys_name())
-            rabbit_util.clean_by_sysname()
-        self.addCleanup(cleanup_broker)
+        # Note: Durable queue cleaned by force_clean after test
 
     @patch.dict('pyon.ion.exchange.CFG', PyonTestCase._get_alt_cfg({'container':{'messaging':{'names':{'durable':False}}}}))
     def test_durable_off_on_create(self):
