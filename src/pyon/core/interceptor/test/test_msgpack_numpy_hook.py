@@ -12,10 +12,14 @@ import unittest
 
 import collections
 import time
-import numpy
 import random
 from msgpack import packb, unpackb
 import hashlib
+
+try:
+    import numpy
+except ImportError as e:
+    _have_numpy = False
 
 from pyon.core.interceptor.encode import encode_ion, decode_ion
 
@@ -67,7 +71,7 @@ class PackRunBase(object):
 
             ('object',('object',lambda o: {count:chr(count)*8}, (None,)))
 
-        ]
+        ] if _have_numpy else []
     )
 
     shapes = ((1,),(3,4), (9,12,18), (10,10,10,10),)
@@ -79,6 +83,7 @@ class PackRunBase(object):
         self._decoder = decode_ion
         self._encoder = encode_ion
 
+    @unittest.skipIf(not _have_numpy, 'No numpy')
     def test_all(self):
 
         for shape in self.shapes:
@@ -114,17 +119,8 @@ class PackRunBase(object):
             assert_equals(sha1(array.tostring()), sha1(new_array.tostring()))
 
 
-class NumpyMsgPackTestCase(unittest.TestCase, PackRunBase ):
+class NumpyMsgPackTestCase(unittest.TestCase, PackRunBase):
 
     def __init__(self,*args, **kwargs):
         unittest.TestCase.__init__(self,*args, **kwargs)
         PackRunBase.__init__(self,*args, **kwargs)
-
-
-
-if __name__ == '__main__':
-
-    pb = PackRunBase()
-
-    pb.test_all()
-

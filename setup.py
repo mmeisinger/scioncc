@@ -77,11 +77,11 @@ setup(  name='scioncc',
             'pyyaml==3.10',
             'simplejson==3.6.5',
             'msgpack-python==0.1.13',  # TBD: Check if this specific version is needed
-            'pika==0.9.5',             # Messaging stack is tested and working with issues of this version
+            'pika==0.9.5',             # NEED THIS VERSION. Messaging stack tweaked to this version
             'httplib2==0.9.1',
             'zope.interface==4.1.1',
             'psycopg2==2.5.4',
-            'numpy==1.9.2   ',
+            'numpy==1.9.2',
             'python-daemon==2.0.5',
             'ipython==0.13.0',
             'readline==6.2.4.1',
@@ -90,16 +90,14 @@ setup(  name='scioncc',
             'psutil==2.1.3',
             'Flask==0.10.1',
             'flask-socketio==0.4.1',
-            'python-dateutil==2.4.2',
-            'pytz',
             'bcrypt==1.0.1',           # For password authentication
-            'lovely.buildouthttp==0.6.1',    # For buildout (getting password protected eggs)
             'pyzmq==2.2.0',            # For IPython manhole
-            'gevent_zeromq==0.2.5',
+            'gevent_zeromq==0.2.5',    # For old pyzmq patching
             'flask-oauthlib==0.9.1',
-            'requests-oauthlib==0.4.2',
+            'pyproj==1.9.4',           # For geospatial calculations (e.g. bbox midpoint)
 
-            # Pin dependent libraries
+            # Pin dependent libraries to be safe
+            'requests-oauthlib==0.4.2',
             'cffi==0.9.2',
             'oauthlib==0.7.2',
             'six==1.9.0',
@@ -107,27 +105,18 @@ setup(  name='scioncc',
             # Test support
             'nose==1.1.2',
             'mock==0.8',
-            'webtest==2.0.17',         # For service gateway test
-            'coverage==4.0a5',         # Code coverage
-
-            # Check if all these are needed
-            'graypy==0.2.11',          # For production logging
-            'ntplib==0.3.3',
-            'pyproj==1.9.4'            # For geospatial calculations
-            #'M2Crypto==0.22.3',        # For X.509 certificates (currently unused)
+            'coverage==4.0',           # Code coverage
         ],
         extras_require={
-            'scidata': [
-                'Pydap==3.3.RC1',
-                'netCDF4==1.0.9',
-            ],
             'utils': [
                 'xlrd==0.9.3',         # For Excel file read (dev tools)
                 'xlwt==0.7.5',         # For Excel file write (dev tools)
             ],
-            'parsing': [
-                'lxml==3.4.2',
-                'beautifulsoup4==4.3.2',
+            'logging': [
+                'graypy==0.2.11',      # For production logging
+            ],
+            'security': [
+                'M2Crypto==0.22.3',    # For X.509 certificates (currently unused)
             ],
         }
      )
